@@ -18,7 +18,7 @@ const AddTask = () => {
         </div>
       </div>
       <div
-        className={`w-[36rem] ${
+        className={`w-[36rem] z-50 ${
           isViewTask ? "right-8" : "-right-full"
         } absolute overflow-hidden -right-full top-8 min-h-[38rem] p-3 bg-white rounded-md shadow-2xl\ mx-auto`}
       >

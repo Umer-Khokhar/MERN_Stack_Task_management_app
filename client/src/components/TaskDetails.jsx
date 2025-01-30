@@ -1,43 +1,93 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { statusOpt, assigneeOpt } from "../data";
+import { UpdateTask } from "./utils/TaskProvider";
 import { FaAngleDown } from "react-icons/fa";
 import { MdOutlineClose } from "react-icons/md";
-
 import Select from "react-select";
 
-const TaskDetails = () => {
-  const statusOpt = [
-    { value: "to do", label: "To Do" },
-    { value: "in progress", label: "In Progress" },
-    { value: "completed", label: "Completed" },
-  ];
-  const assigneeOpt = [
-    { value: "umer khokhar", label: "Umer Khokhar" },
-    { value: "ramzan malik", label: "Ramzan Malik" },
-    { value: "nadir ali", label: "Nadir Ali" },
-    { value: "bilal ahmed", label: "Bilal Ahmed" },
-  ];
+const TaskDetails = (task) => {
+
+
+  const {
+    task: { title, description, createdAt, updatedAt, assignee, status, _id },
+  } = task;
+
+  // Create state for title, description, assignee, status
+  const [isEditing, setIsEditing] = useState(false);
+  const [updatedTitle, setUpdatedTitle] = useState(title);
+  const [updatedDescription, setUpdatedDescription] = useState(description);
+  const [updatedAssignee, setUpdatedAssignee] = useState(assignee);
+  const [updatedStatus, setUpdatedStatus] = useState(status);
+
+  // use ref
+  const inputRef = useRef();
+
+  const handleEditing = () => {
+    setIsEditing(true);
+  };
+
+  // Update task function
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    const updatedTask = {
+      ...task.task, // Keep existing properties
+      title: updatedTitle,
+      description: updatedDescription,
+      status: updatedStatus,
+      assignee: updatedAssignee
+    };
+
+    // Send the updated task to backend
+    await UpdateTask(_id, updatedTask)
+      .then(() => {
+        console.log("Task updated");
+      })
+      .catch((err) => {
+        console.log("Failed to update task", err);
+      });
+  };
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+    }
+  }, [isEditing]);
+
   return (
-    <div className="absolute  top-0 left-0 right-0 bottom-0 hidden justify-center items-center w-full h-screen bg-gray-300">
+    <div
+      className={`absolute cursor-auto flex top-0 left-0 right-0 bottom-0 justify-center items-center w-full h-screen bg-gray-300`}
+    >
       <div className="w-11/12 lg:w-[70%] bg-white mx-auto h-auto">
-        <div className="wrapper  px-[1.5rem] py-6 gap-[2rem] relative flex flex-col-reverse lg:flex-row">
+        <div className="wrapper px-[1.5rem] py-6 gap-[2rem] relative flex flex-col-reverse lg:flex-row">
           <div className="task-info basis-[65%]">
-            <h1
-              className="text-2xl border-none outline-none mb-4"
-              contentEditable
-            >
-              SEO for Solvorr Tech Website
-            </h1>
+            <div onClick={handleEditing} className="text-2xl p-2.5 w-full">
+              {isEditing ? (
+                <input className="w-full border-none outline-none"
+                  value={updatedTitle}
+                  ref={inputRef}
+                  onChange={(e) => setUpdatedTitle(e.target.value)}
+                  type="text"
+                  placeholder="title"
+                />
+              ) : (
+                <h1>{updatedTitle}</h1>
+              )}
+            </div>
             <div className="description">
               <h3>Description</h3>
-              <p
-                className="border p-4 rounded border-black min-h-[12rem] outline-none"
-                contentEditable
-              >
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum
-                expedita a ducimus necessitatibus quae aliquam eaque sunt, animi
-                molestiae quod asperiores itaque sint libero incidunt unde
-                laudantium numquam saepe aperiam.
-              </p>
+              <div onClick={handleEditing} className="w-full border border-gray-400 min-h-[8rem] h-[9rem]">
+              {isEditing ? (
+                <textarea className="w-full h-full border-none outline-none p-2.5"
+                  value={updatedDescription}
+                  ref={inputRef}
+                  onChange={(e) => setUpdatedDescription(e.target.value)}
+                  type="text"
+                  placeholder="title"
+                />
+              ) : (
+                <h1>{updatedDescription}</h1>
+              )}
+            </div>
             </div>
           </div>
           <div className="other-details flex-1 border border-gray-600 py-3 mt-8 ">
@@ -51,19 +101,21 @@ const TaskDetails = () => {
                 <p className="w-[7rem]">Status:</p>
                 <Select
                   options={statusOpt}
+                  defaultValue={statusOpt.find((option) => option.value === updatedStatus)}
                   className="select-status w-full border-none"
+                  onChange={(e) => setUpdatedStatus(e.value)}
                   styles={{
-                    control: (baseStyle, state) => ({
+                    control: (baseStyle) => ({
                       ...baseStyle,
                       border: "none",
                       backgroundColor: "transparent",
                       outline: "none",
                     }),
-                    dropdownIndicator: (baseStyle, state) => ({
+                    dropdownIndicator: (baseStyle) => ({
                       ...baseStyle,
                       display: "none",
                     }),
-                    indicatorSeparator: (baseStyle, state) => ({
+                    indicatorSeparator: (baseStyle) => ({
                       ...baseStyle,
                       border: "none",
                       display: "none",
@@ -76,20 +128,23 @@ const TaskDetails = () => {
                   <p className="w-[7rem]">Assignee:</p>
                   <Select
                     options={assigneeOpt}
+                    defaultValue={assigneeOpt.find((option) => option.label === assignee
+                    )}
                     className="select-assignee w-full"
+                    onChange={(e) => setUpdatedAssignee(e.value)}
                     styles={{
-                      control: (baseStyle, state) => ({
+                      control: (baseStyle) => ({
                         ...baseStyle,
                         border: "none",
                         backgroundColor: "transparent",
                         outline: "none",
                       }),
-                      dropdownIndicator: (baseStyle, state) => ({
+                      dropdownIndicator: (baseStyle) => ({
                         ...baseStyle,
                         display: "none",
                         border: "none",
                       }),
-                      indicatorSeparator: (baseStyle, state) => ({
+                      indicatorSeparator: (baseStyle) => ({
                         ...baseStyle,
                         border: "none",
                         display: "none",
@@ -100,22 +155,25 @@ const TaskDetails = () => {
               </div>
               <div className="task-createdAt">
                 <p>
-                  Created At:{" "}
-                  <span className="text-gray-500">28th Jan 2025</span>
+                  Created At: <span className="text-gray-500">{createdAt}</span>
                 </p>
               </div>
               <div className="task-updatedAt">
                 <p>
-                  Updated At:{" "}
-                  <span className="text-gray-500">29th March 2025</span>
+                  Updated At: <span className="text-gray-500">{updatedAt}</span>
                 </p>
               </div>
             </div>
           </div>
         </div>
-          <div className="updateBtn text-right px-4 pb-4">
-            <button className="bg-gray-700 text-white py-3 px-4 rounded-md cursor-pointer relative right-2 hover:bg-gray-500" disabled>Update Now</button>
-          </div>
+        <div className="updateBtn text-right px-4 pb-4">
+          <button
+            className="bg-gray-700 text-white py-3 px-4 rounded-md cursor-pointer relative right-2 hover:bg-gray-500"
+            onClick={handleUpdate}
+          >
+            Update Now
+          </button>
+        </div>
       </div>
     </div>
   );

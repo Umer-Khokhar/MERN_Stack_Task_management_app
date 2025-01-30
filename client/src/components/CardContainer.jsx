@@ -1,9 +1,14 @@
 import React, { useState, useEffect} from 'react'
-import { Card } from './'
+import { Card, TaskDetails } from './'
 import { GetAllTasks } from './utils/TaskProvider'
 
 const CardContainer = () => {
     const [tasks, setTasks] = useState([])
+    const [selected, setSelected] = useState(null)
+    const handleSelect = (id) => {
+        setSelected(id)
+        console.log("selected")
+    }
 
     useEffect(() => {
         GetAllTasks()
@@ -16,11 +21,14 @@ const CardContainer = () => {
         })
     }, [])
   return (
-    <div className='w-11/12 mx-auto mt-32 flex justify-center items-center md:justify-start md:items-start gap-8 flex-wrap'>
+    <div className=' cursor-pointer z-10 w-11/12 mx-auto mt-32 flex justify-center items-center md:justify-start md:items-start gap-8 flex-wrap'>
         {tasks.map((task) => (
-            <Card key={task._id} title={task.title} date={task.createdAt} status={task.status} _id={task._id}/>
+            <div key={task._id} onClick={() => handleSelect(task)}>
+                <Card title={task.title} date={task.createdAt} status={task.status} _id={task._id}/>
+            </div>
 
         ))}
+        {selected && <TaskDetails task={selected}/> }
     </div>
   )
 }
