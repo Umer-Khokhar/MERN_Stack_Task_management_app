@@ -1,77 +1,92 @@
 import React, { useState } from "react";
+import { ReactSelect } from "./";
 import { PostTasks } from "./utils/TaskProvider";
+import { formData } from "../data";
 
 const TaskInput = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("");
   const [assignee, setAssignee] = useState("");
+  
+  const [state, setState] = useState({
+    title: title,
+    description: description,
+    status: status,
+    assignee: assignee,
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newTask = { title, description, assignee, status };
     await PostTasks(newTask);
 
-    setTitle("");
-    setDescription("");
-    setStatus("");
-    setAssignee("");
+    setState({
+      title: "",
+      description: "",
+      status: "",
+      assignee: "",
+    });
   };
   return (
-    <div className="mt-10">
-      <form className="p-2 flex flex-col gap-6" onSubmit={handleSubmit}>
-        <div>
-          <input
-            className={`h1 border-b border-gray-300 w-full py-2 px-3 text-2xl text-gray-700 rounded-md focus:outline-none focus:shadow-outline`}
-            placeholder="Add a new Title..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
-        <div className="flex flex-col gap-5">
-          <div className="flex items-center">
-            <label className="w-[8rem]">Assignee</label>
-            <input
-              className={`h1 py-2 px-3 w-full text-gray-700 rounded-md focus:outline-none focus:shadow-outline`}
-              placeholder="Assignee..."
-              value={assignee}
-              onChange={(e) => setAssignee(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center">
-            <label className="w-[8rem]">Status</label>
-            <input
-              className={`h1 capitalize py-2 px-3 w-full text-gray-700 rounded-md focus:outline-none focus:shadow-outline`}
-              placeholder="Status..."
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="px-3 border-b mt-4 border-gray-300">
-          <h3 className="border-b border-gray-700 inline-block">Description</h3>
-        </div>
-        <div className="w-full mx-auto">
-          <textarea
-            className=" w-full bg-gray-100  mx-auto min-h-[7rem] outline-none mt-4 px-4 py-3 rounded-md"
-            name=""
-            id=""
-            placeholder="Enter your Description Task "
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          ></textarea>
-        </div>
-        <div className="flex w-full text-right items-end justify-end">
-          <button
-            type="submit"
-            className={`bg-gray-700 text-gray-100 px-4 py-2.5 rounded-sm text-right cursor-pointer`}
-            onSubmit={handleSubmit}
-          >
-            Create Task
-          </button>
-        </div>
-      </form>
-    </div>
+    <form className="mt-10" onSubmit={handleSubmit}>
+      <div className="container py-3">
+        {formData
+          .filter((task) => task.isSelect)
+          .map((task, index) => (
+            <div className="flex mb-6 gap-5" key={index}>
+              <label className="min-w-[5rem]">{task.name}:</label>
+              <ReactSelect
+                onChange={(e) =>
+                  task.name === "assignee"
+                    ? setAssignee(e.value)
+                    : setStatus(e.value)
+                }
+                options={task.options}
+              />
+            </div>
+          ))}
+      </div>
+
+      {formData.map(
+        (task, index) =>
+          !task.isSelect && (
+            <div className="container py-5" key={index}>
+              {task.type === "textarea" && (
+                <textarea
+                  className="outline-none border border-gray-500 min-h-[10rem] p-2.5 h-full w-full"
+                  placeholder={task.placeholder}
+                  value={task.name === "description" ? description : ""}
+                  onChange={(e) => {
+                    task.name === "description" &&
+                      setDescription(e.target.value);
+                  }}
+                />
+              )}
+              {task.type === "text" && (
+                <input
+                  type="text"
+                  className="w-full border-b border-gray-600 pb-3 mb text-2xl outline-none"
+                  placeholder={task.placeholder}
+                  value={task.name === "title" ? title : ""}
+                  onChange={(e) => {
+                    task.name === "title" && setTitle(e.target.value);
+                  }}
+                />
+              )}
+            </div>
+          )
+      )}
+      <div className="btn w-full flex justify-end items-end">
+        <button
+          onSubmit={handleSubmit}
+          type="submit"
+          className="text-right bg-gray-600 py-3 px-4 text-white rounded hover:bg-gray-400 cursor-pointer"
+        >
+          Create Task
+        </button>
+      </div>
+    </form>
   );
 };
 

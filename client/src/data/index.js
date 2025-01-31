@@ -16,29 +16,33 @@ export const assigneeOpt = [
     {
       name: "title",
       type: "text",
-      label: null,
+      label: false,
       placeholder: "Enter your Title",
       required: true,
+      isSelect: false
     },
     {
-      name: "description",
-      type: "textarea",
-      label: null,
-      placeholder: "Enter your Description",
-      required: true,
-    }, 
-    {
-      name: "Assignee",
+      name: "assignee",
       type: "select",
-      label: null,
+      label: true,
       options: assigneeOpt,
       required: true,
+      isSelect: true
     },
     {
       name: "status",
       type: "select",
-      label: null,
+      label: true,
       options: statusOpt,
       required: true,
-    }
+      isSelect: true
+    },
+    {
+      name: "description",
+      type: "textarea",
+      label: false,
+      placeholder: "Enter your Description",
+      required: true,
+      isSelect: false
+    }, 
   ]

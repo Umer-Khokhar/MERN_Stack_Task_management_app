@@ -5,6 +5,8 @@ import { GetAllTasks } from './utils/TaskProvider'
 const CardContainer = () => {
     const [tasks, setTasks] = useState([])
     const [selected, setSelected] = useState(null)
+
+    
     const handleSelect = (id) => {
         setSelected(id)
         console.log("selected")
