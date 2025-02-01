@@ -14,10 +14,7 @@ const dbUrl = process.env.DATABASE_URL
 // cores 
 app.use(
     cors({
-        origin: [
-            'http://localhost:5173', 
-            'https://task-management-app1-snowy.vercel.app'
-        ],
+        origin: "*",
         credentials: true,
         allowedHeaders: ['Content-Type', 'Authorization'],
         methods: ['GET', 'POST', 'PATCH', 'DELETE']
