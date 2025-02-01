@@ -1,6 +1,6 @@
 import axios from "axios";
 import { FetchFromData } from "../"
-const fetchUrl = 'http://localhost:3000/api/tasks'
+const fetchUrl = 'https://mern-stack-task-management-app.vercel.app/api/tasks' || 'http://localhost:3000/api/tasks'
 
 
 export const GetAllTasks = async () => {

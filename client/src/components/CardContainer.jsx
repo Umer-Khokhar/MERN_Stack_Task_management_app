@@ -24,7 +24,7 @@ const CardContainer = () => {
 
     if (!tasks || tasks.length === 0) {
         return (
-            <p className='mt-20 text-xl'>404 There is no Task found</p>
+            <p className='mt-20 text-xl'>Tasks are loading, no task found</p>
         )
     }
      
