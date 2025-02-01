@@ -16,7 +16,6 @@ const CardContainer = () => {
         GetAllTasks()
         .then((tasksData) => {
             setTasks(tasksData)
-            console.log('Fetched tasks:', tasksData)
         }) 
         .catch((error) => {
             console.error('Error fetching tasks:', error)

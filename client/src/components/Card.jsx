@@ -5,7 +5,6 @@ import { formatDistanceToNow } from "date-fns";
 
 
 const Card = ({ title, date, _id , onClick}) => {
-  console.log(title, date)
   const { dltTask } = useTaskContext();
   
   const handleDlt = async (e) => {

@@ -4,7 +4,10 @@ const app = express();
 const taskRoutes = require("./routes/taskRoutes.js")
 const PORT = process.env.PORT || 3000
 const Mongoose = require('mongoose');
-const dbString = "mongodb+srv://umer:umer1234@taskclustor.ahjlq.mongodb.net/?retryWrites=true&w=majority&appName=taskClustor"
+
+require('dotenv').config();
+
+const dbUrl = process.env.DATABASE_URL
 
 
 
@@ -34,7 +37,7 @@ app.get('/', (req, res) => {
 
 
 // Mongoose
-Mongoose.connect(dbString)
+Mongoose.connect(dbUrl)
 .then(() => {
     console.log("Connected to MongoDB");    
 })
