@@ -1,32 +1,54 @@
 import React, { useState } from "react";
-import { ReactSelect } from "./";
+import { ReactSelect, useTaskContext } from "./";
 import { PostTasks } from "./utils/TaskProvider";
 import { formData } from "../data";
 
 const TaskInput = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("");
-  const [assignee, setAssignee] = useState("");
-  
-  const [state, setState] = useState({
-    title: title,
-    description: description,
-    status: status,
-    assignee: assignee,
-  });
+  const [status, setStatus] = useState(null);
+  const [assignee, setAssignee] = useState(null);
+  const [error, setError] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
+  const [emptyField, setEmptyField] = useState([]);
+  const { createTask } = useTaskContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newTask = { title, description, assignee, status };
-    await PostTasks(newTask);
+  
+    try {
+      const response = await PostTasks(newTask);
+      const json = response.data;
+      createTask(json);
+  
+      setError(null);
+      setEmptyField([]);
+      setTitle("")
+      setDescription("")
+      setAssignee(null)
+      setStatus(null)
+      setSuccessMsg("Successfully created new task")
+      setTimeout(() => {
+        setSuccessMsg(null)
+      }, 2000);
+  
+    } catch (error) {
+      if (error.response) {
+        // Server responded with a non-2xx status
+        setSuccessMsg(null)
+        const json = error.response.data;
+        setError(json.error || 'An error occurred');
+        setEmptyField(json.emptyField || []);
+      } else if (error.request) {
+        setError('No response from server');
+        setEmptyField([]);
+      } else {
+        setError(error.message || 'An error occurred');
+        setEmptyField([]);
+      }
 
-    setState({
-      title: "",
-      description: "",
-      status: "",
-      assignee: "",
-    });
+    }
   };
   return (
     <form className="mt-10" onSubmit={handleSubmit}>
@@ -36,13 +58,26 @@ const TaskInput = () => {
           .map((task, index) => (
             <div className="flex mb-6 gap-5" key={index}>
               <label className="min-w-[5rem]">{task.name}:</label>
+              {emptyField.includes("assignee") ? (
+                <span className="text-red-500">Select</span>
+              ): emptyField.includes("assignee") ? (
+                <span className="text-red-500">Select</span>
+              ) : (
+                ""
+              )}
               <ReactSelect
+              value={
+                task.name === "assignee"
+                  ? task.options.find((opt) => opt.value === assignee) || null 
+                  : task.options.find((opt) => opt.value === status) || null
+              }
                 onChange={(e) =>
                   task.name === "assignee"
-                    ? setAssignee(e.value)
-                    : setStatus(e.value)
+                    ? setAssignee(e.value || null)
+                    : setStatus(e.value || null)
                 }
                 options={task.options}
+                isClearable={true}
               />
             </div>
           ))}
@@ -54,7 +89,7 @@ const TaskInput = () => {
             <div className="container py-5" key={index}>
               {task.type === "textarea" && (
                 <textarea
-                  className="outline-none border border-gray-500 min-h-[10rem] p-2.5 h-full w-full"
+                  className={` ${emptyField.includes('description') ? "border-red-500" : "border-gray-500"} outline-none border border-gray-500 min-h-[10rem] p-2.5 h-full w-full `}
                   placeholder={task.placeholder}
                   value={task.name === "description" ? description : ""}
                   onChange={(e) => {
@@ -66,7 +101,7 @@ const TaskInput = () => {
               {task.type === "text" && (
                 <input
                   type="text"
-                  className="w-full border-b border-gray-600 pb-3 mb text-2xl outline-none"
+                  className={`${emptyField.includes('description') ? "border-red-500" : "border-gray-500"} w-full border-b border-gray-600 pb-3 mb text-2xl outline-none`}
                   placeholder={task.placeholder}
                   value={task.name === "title" ? title : ""}
                   onChange={(e) => {
@@ -86,6 +121,8 @@ const TaskInput = () => {
           Create Task
         </button>
       </div>
+        {error && <div className="text-red-500 mt-4 px-3 text-xl py-4 bg-red-100 border border-red-400">{error}</div>}
+        {successMsg && <div className="text-green-600 mt-4 px-3 py-4 bg-green-100 border border-green-600">{successMsg}</div>}
     </form>
   );
 };

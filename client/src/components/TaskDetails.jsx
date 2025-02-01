@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ModalWrapper, TaskInfoSection, DetailsSection } from "./"
+import { ModalWrapper, TaskInfoSection, DetailsSection, useTaskContext } from "./"
 
 import { UpdateTask } from "./utils/TaskProvider";
 
-const TaskDetails = (task) => {
-  const { task: { title, description, createdAt, updatedAt, assignee, status, _id } } = task;
+const TaskDetails = ({task, isClose}) => {
+  const { title, description,createdAt,updatedAt, assignee, status, _id  } = task;
 
   // Create state for title, description, assignee, status
   const [ state, setState ] = useState({title, description, assignee, status})
@@ -15,8 +15,9 @@ const TaskDetails = (task) => {
   const [updatedDescription, setUpdatedDescription] = useState(description);
   const [updatedAssignee, setUpdatedAssignee] = useState(assignee);
   const [updatedStatus, setUpdatedStatus] = useState(status);
+  const [successMsg, setSuccessMsg] = useState(null)
 
-  // use ref
+  const { setTaskList } = useTaskContext()
 
   const handleEditing = () => {
     setIsEditing(true);
@@ -27,18 +28,28 @@ const TaskDetails = (task) => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     const updatedTask = {
+      _id,
       title: updatedTitle,
       description: updatedDescription,
       assignee: updatedAssignee,
-      status: updatedStatus
+      status: updatedStatus, 
+      createdAt,
+      updatedAt
     };
-    await UpdateTask(_id, updatedTask)
-      .then(() => {
-        console.log("Task updated");
-      })
-      .catch((err) => {
-        console.log("Failed to update task", err);
-      });
+    let response = await UpdateTask(_id, updatedTask)
+    if (response.status >= 200 && response.status < 300) {
+      setIsEditing(false);
+      setTaskList(updatedTask)
+      console.log("Task updated");
+      setSuccessMsg("Task updated successfully");
+      setTimeout(() => {
+        setSuccessMsg(null)
+      }, 2000);
+    } else {
+      console.error("Failed to update task", response.status);
+      setIsEditing(false);
+      setSuccessMsg(null);
+    }
   };
   useEffect(() => {
     if (isEditing) {
@@ -60,11 +71,11 @@ const TaskDetails = (task) => {
           setTitle={setUpdatedTitle}/>
 
         <DetailsSection 
+        onClick={isClose}
           state={state} 
           setAssignee={setUpdatedAssignee} 
           setStatus={setUpdatedStatus}
-          updatedAt={updatedAt}
-          createdAt={createdAt} 
+          updatedAt={updatedAt} 
           />
         </div>
         <div className="updateBtn text-right px-4 pb-4">
@@ -75,6 +86,9 @@ const TaskDetails = (task) => {
             Update Now
           </button>
         </div>
+        {successMsg && (
+          <div className="p-4 m-2 bg-green-100 text-green-700 border border-green-500">{successMsg}</div>
+        )}
       </div>
     </ModalWrapper>
   );

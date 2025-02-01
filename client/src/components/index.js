@@ -9,3 +9,9 @@ export { default as ActionBtn } from "./ActionBtn"
 export { default as DetailsSection } from "./DetailsSection"
 export { default as ModalWrapper } from "./ModalWrapper"
 export { default as TaskInfoSection } from "./TaskInfoSection"
+
+
+// context Api 
+
+import { useTaskContext, ContextProvider } from "./contextApi/ContextProvider"
+export { useTaskContext, ContextProvider }

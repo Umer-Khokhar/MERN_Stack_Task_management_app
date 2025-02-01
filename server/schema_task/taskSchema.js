@@ -20,14 +20,8 @@ const taskSchema = new Schema({
     enum: ["to do", "in progress", "completed"],
     default: "to do",
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
+}, {
+  timestamps: true,
 });
 
 taskSchema.pre("save", (next) => {

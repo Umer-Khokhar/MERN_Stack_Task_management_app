@@ -13,16 +13,10 @@ export const GetAllTasks = async () => {
 }
 
 export const PostTasks = async (task) => {
-    try {
-        const {data} = await axios.post(fetchUrl, task, {
-            headers: {'Content-Type': 'application/json'
-            }
-            })
-            return data;
-    } catch (err) {
-        console.error(err.message);
-    }
-}
+    return axios.post(fetchUrl, task, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  };
 
 export const DeleteTask = async (taskId) => {
     try {
@@ -34,12 +28,7 @@ export const DeleteTask = async (taskId) => {
 }
 
 export const UpdateTask = async (taskId, updatedTask) => {
-    try {
-        const {data} = await axios.patch(`${fetchUrl}/${taskId}`, updatedTask, {
-            headers: { "Content-Type": "application/json" }
-        })
-        return data;
-    } catch (err) {
-        console.error(err.message);
-    }
+    return axios.patch(`${fetchUrl}/${taskId}`, updatedTask, {
+      headers: { 'Content-Type': 'application/json' }
+    });
 }
